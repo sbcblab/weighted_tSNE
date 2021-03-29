@@ -13,18 +13,6 @@ You will need Python 3 to run this code. Check if the needed libraries are insta
 ```
 python3 check_dep.py
 ```
-To train neural networks, use:
-```
-python3 train.py config.py
-```
-The relevance scores can then be computed by:
-```
-python3 get_relevances.py config.py
-```
-To generate the table heatmaps, run:
-```
-python3 heatsheets.py config.py
-```
 And for the weighted t-SNE visualization, run:
 ```
 python3 visualize.py config.py
@@ -45,11 +33,8 @@ This implementation of relevance aggregation uses the following [Python 3.7](htt
 - [NumPy](https://numpy.org/)
 - [Pandas](https://pandas.pydata.org/)
 - [Matplotlib](https://matplotlib.org/)
-- [TensorFlow Keras](https://www.tensorflow.org/guide/keras)
 - [SciPy](https://www.scipy.org/)
 - [Scikit-learn](https://scikit-learn.org/stable/)
-- [LRP Toolbox](https://github.com/sebastian-lapuschkin/lrp_toolbox)
-- [DeepLIFT](https://github.com/kundajelab/deeplift)
 
 ## How to cite
 
