@@ -66,6 +66,11 @@ try:
 except:
     print('Could not import matplotlib.pyplot')
 
+try:
+    import plotly
+except:
+    print('Could not import plotly')    
+
 ########################################
 
 try:

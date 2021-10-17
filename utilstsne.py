@@ -3,6 +3,8 @@ from os.path import abspath, dirname, join
 import numpy as np
 import scipy.sparse as sp
 import matplotlib.pyplot as plt
+import plotly.express as px
+from mpl_toolkits.mplot3d import Axes3D
 
 FILE_DIR = dirname(abspath(__file__))
 DATA_DIR = join(FILE_DIR, "data")
@@ -268,6 +270,17 @@ def select_genes(
 
     return selected
 
+def iteractive_plot(df, x_label, y_label, z_label=None, color_label=[], colors=[], size=80, hover_name='index'):
+    df['index'] = df.index
+    dot_size = np.empty(df.shape[0])
+    dot_size.fill(size)
+    if z_label is None:
+        fig = px.scatter(df, x=x_label, y=y_label, color=color_label, color_discrete_sequence=colors,
+                     symbol=color_label, size=dot_size, hover_name=hover_name)
+    else:
+        fig = px.scatter_3d(df, x=x_label, y=y_label, z=z_label, color=color_label, color_discrete_sequence=colors,
+                     symbol=color_label, size=dot_size, hover_name=hover_name)        
+    return fig
 
 def plot(
     x,
@@ -286,13 +299,27 @@ def plot(
 ):
     import matplotlib
 
+    n_dimensions = x.shape[1]
+    if n_dimensions > 3:
+        n_dimensions = 3
+        print('Number of dimensions is larger than 3, plotting the first 3 components.')
+    #if n_dimensions == 3:
+        #fig = plt.figure()
+        #ax = Axes3D(fig)
+
     if ax is None:
-        _, ax = matplotlib.pyplot.subplots(figsize=(8, 8))
+        if n_dimensions < 3:
+            _, ax = matplotlib.pyplot.subplots(figsize=(8, 8))
+        else:
+            fig = plt.figure()
+            ax = fig.add_subplot(projection='3d')
 
     if title is not None:
         ax.set_title(title)
 
     plot_params = {"alpha": kwargs.get("alpha", 0.6), "s": kwargs.get("s", 1)}
+
+
 
     if task == 'classification':
 
@@ -308,20 +335,37 @@ def plot(
 
         point_colors = list(map(colors.get, y))
 
-        ax.scatter(x[:, 0], x[:, 1], c=point_colors, rasterized=True, **plot_params)
+        if n_dimensions == 1:
+            ax.scatter(x[:, 0], x[:, 0], c=point_colors, rasterized=True, **plot_params)
+        elif n_dimensions == 2:
+            ax.scatter(x[:, 0], x[:, 1], c=point_colors, rasterized=True, **plot_params)
+        else:
+            ax.scatter(x[:, 0], x[:, 1], x[:, 2], c=point_colors, rasterized=True, **plot_params)
 
         # Plot mediods
         if draw_centers:
             centers = []
             for yi in classes:
                 mask = yi == y
-                centers.append(np.median(x[mask, :2], axis=0))
+                if n_dimensions < 3:
+                    centers.append(np.median(x[mask, :2], axis=0))
+                else:
+                    centers.append(np.median(x[mask, :3], axis=0))
             centers = np.array(centers)
 
             center_colors = list(map(colors.get, classes))
-            ax.scatter(
-                centers[:, 0], centers[:, 1], c=center_colors, s=48, alpha=1, edgecolor="k", marker="s"
-            )
+            if n_dimensions == 1:
+                ax.scatter(
+                    centers[:, 0], centers[:, 0], c=center_colors, s=48, alpha=1, edgecolor="k", marker="s"
+                )
+            elif n_dimensions == 2:
+                ax.scatter(
+                    centers[:, 0], centers[:, 1], c=center_colors, s=48, alpha=1, edgecolor="k", marker="s"
+                )
+            else:
+                 ax.scatter(
+                    centers[:, 0], centers[:, 1], centers[:, 2], c=center_colors, s=48, alpha=1, edgecolor="k", marker="s"
+                )               
 
             # Draw mediod labels
             if draw_cluster_labels:
@@ -337,7 +381,12 @@ def plot(
     elif task == 'regression':
 
         target_color = y.astype(float)
-        s = ax.scatter(x[:, 0], x[:, 1], c=target_color, cmap='coolwarm')
+        if n_dimensions == 1:
+            s = ax.scatter(x[:, 0], x[:, 0], c=target_color, cmap='coolwarm')
+        elif n_dimensions == 2:
+            s = ax.scatter(x[:, 0], x[:, 1], c=target_color, cmap='coolwarm')
+        else:
+            s = ax.scatter(x[:, 0], x[:, 1], x[:, 2], c=target_color, cmap='coolwarm')
         cbar = plt.colorbar(s, ax=ax)
         cbar.set_label(class_label)
         draw_legend = False
