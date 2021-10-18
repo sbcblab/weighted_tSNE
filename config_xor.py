@@ -1,14 +1,14 @@
 # Bruno Iochins Grisci
 # February 18st, 2021
 
-dataset_file   = "DATA/datasets/Liver_GSE22405.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
-weights_file   = "DATA/selections/RelAgg_Liver_GSE22405.csv"
+dataset_file   = "DATA/datasets/xor_500samples_50features.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
+weights_file   = "DATA/selections/RelAgg_xor_num_features_50_num_selected_50.csv"
 #'MRMR' 'MutualInformationFilter' 'KruskallWallisFilter''ReliefFFeatureSelector' 'Lasso' 'LinearSVM' 'SVMRFE''ReliefFGeneticAlgorithm' 'DecisionTree' 'RandomForest''SVMGeneticAlgorithm'
 task           = "classification" # "classification" or "regression"
-class_label    = "type"              # label of the column with the classes or target values
-row_index      = 0           # The column that has the row index, None if no index
+class_label    = "class"              # label of the column with the classes or target values
+row_index      = None           # The column that has the row index, None if no index
 dataset_sep    = ","              # use ',' to separate columns in the dataset
-output_folder  = 'TESE/LIVER/'        # name of directory in which the results will be saved
+output_folder  = 'TESE/XOR/'        # name of directory in which the results will be saved
 
 standardized   = True # True if data should be normalized with the z-norm (M=0.0, std=1.0)
 rescaled       = False # True if data should be scaled between 0 and 1

@@ -220,6 +220,7 @@ def main():
                  'MRMR', 'MutualInformationFilter', 'RandomForest', 'ReliefFFeatureSelector',
                  'ReliefFGeneticAlgorithm', 'SVMGeneticAlgorithm', 'SVMRFE']    
 
+    plt.close()
 
 if __name__ == '__main__': 
     main()

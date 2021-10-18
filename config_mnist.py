@@ -1,8 +1,8 @@
 # Bruno Iochins Grisci
 # October 16st, 2021
 
-dataset_file   = "DATA/datasets/fashion-mnist_test.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
-weights_file   = "DATA/selections/fashion-mnist_testtree.csv"
+dataset_file   = "DATA/datasets/mnist_test.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
+weights_file   = "DATA/selections/RelAgg_mnist_test.csv"
 #'MRMR' 'MutualInformationFilter' 'KruskallWallisFilter''ReliefFFeatureSelector' 'Lasso' 'LinearSVM' 'SVMRFE''ReliefFGeneticAlgorithm' 'DecisionTree' 'RandomForest''SVMGeneticAlgorithm'
 task           = "classification" # "classification" or "regression"
 class_label    = "label"              # label of the column with the classes or target values
