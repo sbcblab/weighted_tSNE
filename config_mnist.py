@@ -10,8 +10,8 @@ row_index      = None           # The column that has the row index, None if no 
 dataset_sep    = ","              # use ',' to separate columns in the dataset
 output_folder  = 'RESULTS/test/'        # name of directory in which the results will be saved
 
-standardized        = False # True if data should be normalized with the z-norm (M=0.0, std=1.0)
-rescaled            = True # True if data should be scaled between 0 and 1
+standardized   = False # True if data should be normalized with the z-norm (M=0.0, std=1.0)
+rescaled       = True # True if data should be scaled between 0 and 1
 
 dot_size       = 40
 class_colors   = ['RED', 'BLUE', 'YELLOW', 'CYAN', 'GREEN', 'BEIGE', 'DRKBRW', 'BLACK', 'SILVER', 'ORANGE'] # list of colors to be assigned to the classes in the data, options as below:
