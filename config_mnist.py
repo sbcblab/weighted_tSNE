@@ -17,9 +17,9 @@ dot_size       = 40
 class_colors   = ['RED', 'BLUE', 'YELLOW', 'CYAN', 'GREEN', 'BEIGE', 'DRKBRW', 'BLACK', 'SILVER', 'ORANGE'] # list of colors to be assigned to the classes in the data, options as below:
                                      # 'RED', 'BLUE', 'YELLOW', 'GREEN', 'ORANGE', 'BLACK', 'CYAN', 'SILVER', 'MAGENTA', 'CREAM', 'DRKBRW', 'BEIGE', 'WHITE'
 compute_pca    = True   # if PCA should be computed and shown
-show_figs      = True   # if the plots should be displayed in addition to saved
+show_figs      = False   # if the plots should be displayed in addition to saved
 
 no_weights     = True  # If True plots regular t-SNE
-n_components   = 2      # dimensions of the embedding
+n_components   = 3      # dimensions of the embedding
 perplexity     = 'auto' # perplexity value for t-SNE, if 'auto' then perplexity = max(30, x.shape[0]/100)
 n_iter         = 500    # number of iterations for t-SNE

@@ -1,6 +1,6 @@
 # Bruno Iochins Grisci
 # February 18st, 2021
-
+#
 import os
 import sys
 import importlib
@@ -43,7 +43,7 @@ dummy = False
 #dummy = 'one'
 #dummy = 50
 
-def get_pca(x, df, y, file_to_save, colors, original_silhouette, weighted_silhouette):
+def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silhouette, weighted_silhouette):
     pca = PCA(n_components=cfg.n_components)
     components = pca.fit_transform(x)
     var = pca.explained_variance_ratio_
@@ -60,7 +60,7 @@ def get_pca(x, df, y, file_to_save, colors, original_silhouette, weighted_silhou
     zl = None
     if cfg.n_components > 2:
         zl = pca_columns_labels[2]    
-    fig = utilstsne.iteractive_plot(pca_emb, x_label=pca_columns_labels[0], y_label=pca_columns_labels[1], z_label=zl, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
+    fig = utilstsne.iteractive_plot(pca_emb, x_label=pca_columns_labels[0], y_label=pca_columns_labels[1], z_label=zl, sorted_classes={class_label: classes}, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
     fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d.html'.format(cfg.n_components)))
     if cfg.show_figs:
         fig.show()
@@ -159,7 +159,7 @@ def main():
     weighted_silhouette = metrics.silhouette_score(wx, y, metric='euclidean')
 
     if cfg.compute_pca:
-        get_pca(wx, df, y, file_to_save, COL, original_silhouette, weighted_silhouette)
+        get_pca(wx, df, y, file_to_save, cfg.class_label, classes, COL, original_silhouette, weighted_silhouette)
 
     perp = 0
     if cfg.perplexity == "auto":
@@ -205,7 +205,7 @@ def main():
         zl = None
         if cfg.n_components > 2:
             zl = emb_columns_labels[2]
-        plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
+        plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, sorted_classes={cfg.class_label: classes}, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
         plotly_fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.html'.format(cfg.n_components)))
         if cfg.show_figs:
             plotly_fig.show()

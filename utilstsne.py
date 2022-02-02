@@ -270,15 +270,17 @@ def select_genes(
 
     return selected
 
-def iteractive_plot(df, x_label, y_label, z_label=None, color_label=[], colors=[], size=80, hover_name='index'):
+def iteractive_plot(df, x_label, y_label, z_label=None, sorted_classes = {}, color_label=[], colors=[], size=80, hover_name='index'):
     df['index'] = df.index
     dot_size = np.empty(df.shape[0])
     dot_size.fill(size)
+    print('sorted_classes')
+    print(sorted_classes)
     if z_label is None:
-        fig = px.scatter(df, x=x_label, y=y_label, color=color_label, color_discrete_sequence=colors,
+        fig = px.scatter(df, x=x_label, y=y_label, category_orders=sorted_classes, color=color_label, color_discrete_sequence=colors,
                      symbol=color_label, size=dot_size, hover_name=hover_name)
     else:
-        fig = px.scatter_3d(df, x=x_label, y=y_label, z=z_label, color=color_label, color_discrete_sequence=colors,
+        fig = px.scatter_3d(df, x=x_label, y=y_label, z=z_label, category_orders=sorted_classes, color=color_label, color_discrete_sequence=colors,
                      symbol=color_label, size=dot_size, hover_name=hover_name)        
     return fig
 
