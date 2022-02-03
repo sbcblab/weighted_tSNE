@@ -2,7 +2,7 @@
 # February 18st, 2021
 
 dataset_file   = "DATA/datasets/xor_500samples_50features.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
-weights_file   = "DATA/selections/RelAgg_xor_num_features_50_num_selected_50.csv"
+weights_file   = "DATA/selections/RandomForest_xor_num_features_50_num_selected_50.csv"
 #'MRMR' 'MutualInformationFilter' 'KruskallWallisFilter''ReliefFFeatureSelector' 'Lasso' 'LinearSVM' 'SVMRFE''ReliefFGeneticAlgorithm' 'DecisionTree' 'RandomForest''SVMGeneticAlgorithm'
 task           = "classification" # "classification" or "regression"
 class_label    = "class"              # label of the column with the classes or target values
@@ -17,7 +17,8 @@ dot_size       = 80
 class_colors   = ['RED', 'BLUE', 'ORANGE', 'GREEN', 'YELLOW', 'BLACK'] # list of colors to be assigned to the classes in the data, options as below:
                                      # 'RED', 'BLUE', 'YELLOW', 'GREEN', 'ORANGE', 'BLACK', 'CYAN', 'SILVER', 'MAGENTA', 'CREAM', 'DRKBRW', 'BEIGE', 'WHITE'
 compute_pca    = True   # if PCA should be computed and shown
-show_figs      = True   # if the plots should be displayed in addition to saved
+show_figs      = False   # if the plots should be displayed in addition to saved
+rotation       = True # if True rotates the t-SNE plot so that all plots have the same orientation (does nothing for PCA or 3D plots)
 
 no_weights     = False  # If True plots regular t-SNE
 n_components   = 2      # dimensions of the embedding

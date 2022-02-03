@@ -1,6 +1,7 @@
 from os.path import abspath, dirname, join
 
 import numpy as np
+import math
 import scipy.sparse as sp
 import matplotlib.pyplot as plt
 import plotly.express as px
@@ -82,6 +83,40 @@ MOUSE_10X_COLORS = {
     37: "#013349",
     38: "#00846F",
 }
+
+def unit_vector(vector):
+    # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+def angle_between(v1, v2):
+    # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::
+
+            >>> angle_between((1, 0, 0), (0, 1, 0))
+            1.5707963267948966
+            >>> angle_between((1, 0, 0), (1, 0, 0))
+            0.0
+            >>> angle_between((1, 0, 0), (-1, 0, 0))
+            3.141592653589793
+    """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+def rotate(points):
+    # https://scipython.com/book/chapter-6-numpy/examples/creating-a-rotation-matrix-in-numpy/
+    baseline_vector = np.array((0.0, 1.0))
+    theta = angle_between(baseline_vector, points[0])
+    print(baseline_vector, points[0], theta)
+    if points.shape[1] == 2:
+        c = np.cos(theta)
+        s = np.sin(theta)
+        R = np.array(((c, -s), (s, c)))
+        points = np.dot(points, R.T)
+        return(points)
+    else:
+        raise Exception('Rotation is only defined for 2D points.')
 
 
 def calculate_cpm(x, axis=1):

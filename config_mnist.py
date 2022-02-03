@@ -18,8 +18,9 @@ class_colors   = ['RED', 'BLUE', 'YELLOW', 'CYAN', 'GREEN', 'BEIGE', 'DRKBRW', '
                                      # 'RED', 'BLUE', 'YELLOW', 'GREEN', 'ORANGE', 'BLACK', 'CYAN', 'SILVER', 'MAGENTA', 'CREAM', 'DRKBRW', 'BEIGE', 'WHITE'
 compute_pca    = True   # if PCA should be computed and shown
 show_figs      = False   # if the plots should be displayed in addition to saved
+rotation       = True # if True rotates the t-SNE plot so that all plots have the same orientation (does nothing for PCA or 3D plots)
 
-no_weights     = True  # If True plots regular t-SNE
-n_components   = 3      # dimensions of the embedding
+no_weights     = False  # If True plots regular t-SNE
+n_components   = 2      # dimensions of the embedding
 perplexity     = 'auto' # perplexity value for t-SNE, if 'auto' then perplexity = max(30, x.shape[0]/100)
 n_iter         = 500    # number of iterations for t-SNE

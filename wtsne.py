@@ -185,8 +185,10 @@ def main():
     )
 
     embedding = tsne.fit(wx)
-
     print(embedding)
+    if cfg.rotation and embedding.shape[1] == 2:
+        embedding = utilstsne.rotate(embedding)
+        print(embedding)
 
     emb_columns_labels = ['wt-SNE {}'.format(i+1) for i in range(cfg.n_components)]
     emb = pd.DataFrame(data=embedding,    # values
