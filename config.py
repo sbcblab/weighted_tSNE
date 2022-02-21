@@ -2,7 +2,7 @@
 # February 21st, 2022
 
 dataset_file   = "DATA/datasets/mnist_test.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
-weights_file   = "DATA/selections/RelAgg_mnist_test.csv" # path to the file with the weights of each feature
+weights_file   = "weights.csv"    # path to the file with the weights of each feature
 #'MRMR' 'MutualInformationFilter' 'KruskallWallisFilter''ReliefFFeatureSelector' 'Lasso' 'LinearSVM' 'SVMRFE''ReliefFGeneticAlgorithm' 'DecisionTree' 'RandomForest''SVMGeneticAlgorithm'
 task           = "classification" # "classification" or "regression"
 class_label    = "label"          # label of the column with the classes or target values
