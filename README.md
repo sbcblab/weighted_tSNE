@@ -2,11 +2,11 @@
 
 Welcome!
 
-Relevance aggregation is a method for computing relevance scores for multilayer feed-forward neural networks trained on tabular data. It can be used to inspect the behavior of the trained models, identify biases, and for knowledge discovery. Besides the numerical values, the relevance scores can be visualized with table heatmaps and weighted t-SNE.
+Weighted t-SNE is a method for...
 
 ## How to use
 
-To configure all the hyperparameters of relevance aggregation, you only need to create a ```config.py``` file. An example can be downloaded [here](config.py). It also contains the necessary documentation.
+To configure all the hyperparameters of Weighted t-SNE, you only need to create a ```config.py``` file. An example can be downloaded [here](config.py). It also contains the necessary documentation. To set the weights of each features you should use a .csv file as in this [example](weights.csv).
 
 You will need Python 3 to run this code. Check if the needed libraries are installed with:
 
@@ -15,7 +15,7 @@ python3 check_dep.py
 ```
 And for the weighted t-SNE visualization, run:
 ```
-python3 visualize.py config.py
+python3 wtsne.py config.py
 ```
 
 ## Data sets
@@ -35,6 +35,8 @@ This implementation of relevance aggregation uses the following [Python 3.7](htt
 - [Matplotlib](https://matplotlib.org/)
 - [SciPy](https://www.scipy.org/)
 - [Scikit-learn](https://scikit-learn.org/stable/)
+- [Plotly](https://plotly.com/python/)
+- [openTSNE](https://opentsne.readthedocs.io/en/latest/)
 
 ## How to cite
 
