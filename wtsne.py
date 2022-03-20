@@ -85,11 +85,6 @@ def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silho
 def main():
     df = pd.read_csv(cfg.dataset_file, delimiter=cfg.dataset_sep, header=0, index_col=cfg.row_index)
     df = RR_utils.check_dataframe(df, cfg.class_label, cfg.task)
-    
-    if cfg.no_weights:
-        file_to_save = cfg.dataset_file
-    else:
-        file_to_save = cfg.weights_file
 
     COL = {}
     CLASS_LABELS = list(np.sort(df[cfg.class_label].astype(str).unique()))
@@ -129,140 +124,152 @@ def main():
     elif cfg.task == 'regression':
         original_silhouette = 0.0
 
-    if not cfg.no_weights:
-        if dummy == False:
-            print('All weights as in %s' % cfg.weights_file)
-            rel = pd.read_csv(cfg.weights_file, delimiter=cfg.dataset_sep, header=0, index_col=0)
-            print(rel)
-            #rel = rel.abs().div(rel.abs().max(axis=1), axis=0)
-            W = rel.to_numpy()
-            if W.shape[1] == 1:
-                W = np.tile(W,(1, x.shape[0])).transpose()
-                wx = np.multiply(W,x)
-            else:
-                wx = np.multiply(W,x) # wx = W * x
-            print("-----")
-            print(df)
-            print(rel)
-        elif dummy == 'zero':
-            print('All weights = 0')
-            weights = np.zeros(x.shape[1])
-            wx = weights * x
-            print(weights)
-            print(weights.shape)
-        elif dummy == 'one':
-            print('All weights = 1')
-            weights = np.ones(x.shape[1])
-            wx = weights * x
-            print(weights)
-            print(weights.shape)    
+    if cfg.no_weights:
+        cfg.weights_file = ['0']
+
+    for selector_file in cfg.weights_file:
+
+        print('### {}'.format(selector_file))
+
+        if cfg.no_weights:
+            file_to_save = cfg.dataset_file
         else:
-            print('%d weights = 1 else 0' % dummy)
-            weights = np.zeros(x.shape[1])
-            for d in range(dummy):
-                weights[d] = 1
-            W = np.tile(weights, (x.shape[0],1))
-            wx = weights * x
-            print(weights)
-            print(weights.shape)
-            print(W)
-            print(W.shape)
+            file_to_save = selector_file
 
-        print(wx)
-        print(wx.shape)
-    else:
-        wx = x
+        if not cfg.no_weights:
+            if dummy == False:
+                print('All weights as in %s' % selector_file)
+                rel = pd.read_csv(selector_file, delimiter=cfg.dataset_sep, header=0, index_col=0)
+                print(rel)
+                #rel = rel.abs().div(rel.abs().max(axis=1), axis=0)
+                W = rel.to_numpy()
+                if W.shape[1] == 1:
+                    W = np.tile(W,(1, x.shape[0])).transpose()
+                    wx = np.multiply(W,x)
+                else:
+                    wx = np.multiply(W,x) # wx = W * x
+                print("-----")
+                print(df)
+                print(rel)
+            elif dummy == 'zero':
+                print('All weights = 0')
+                weights = np.zeros(x.shape[1])
+                wx = weights * x
+                print(weights)
+                print(weights.shape)
+            elif dummy == 'one':
+                print('All weights = 1')
+                weights = np.ones(x.shape[1])
+                wx = weights * x
+                print(weights)
+                print(weights.shape)    
+            else:
+                print('%d weights = 1 else 0' % dummy)
+                weights = np.zeros(x.shape[1])
+                for d in range(dummy):
+                    weights[d] = 1
+                W = np.tile(weights, (x.shape[0],1))
+                wx = weights * x
+                print(weights)
+                print(weights.shape)
+                print(W)
+                print(W.shape)
 
-    if cfg.task == 'classification':
-        weighted_silhouette = metrics.silhouette_score(wx, y, metric='euclidean')
-    elif cfg.task == 'regression':
-        weighted_silhouette = 0.0
+            print(wx)
+            print(wx.shape)
+        else:
+            wx = x
 
-    if cfg.compute_pca:
-        get_pca(wx, df, y, file_to_save, cfg.class_label, classes, COL, original_silhouette, weighted_silhouette)
+        if cfg.task == 'classification':
+            weighted_silhouette = metrics.silhouette_score(wx, y, metric='euclidean')
+        elif cfg.task == 'regression':
+            weighted_silhouette = 0.0
 
-    perp = 0
-    if cfg.perplexity == "auto":
-        perp = max(30, x.shape[0]/100)
-    else:
-        perp = cfg.perplexity
+        if cfg.compute_pca:
+            get_pca(wx, df, y, file_to_save, cfg.class_label, classes, COL, original_silhouette, weighted_silhouette)
 
-    ngm = "fft"
-    if cfg.n_components > 2:
-        ngm = 'barnes-hut'
-    tsne = TSNE(
-        n_components=cfg.n_components,
-        perplexity=perp,
-        initialization=cfg.initialization,
-        metric=cfg.metric,
-        neighbors=cfg.neighbors,
-        learning_rate=cfg.learning_rate,
-        negative_gradient_method=ngm,
-        verbose=True,
-        n_jobs=cfg.n_jobs,
-        n_iter=cfg.n_iter,
-        random_state=cfg.random_seed,
-    )
+        perp = 0
+        if cfg.perplexity == "auto":
+            perp = max(30, x.shape[0]/100)
+        else:
+            perp = cfg.perplexity
 
-    embedding = tsne.fit(wx)
-    #print(embedding)
-    divergence = embedding.kl_divergence
-    
-    if cfg.rotation and embedding.shape[1] == 2:
+        ngm = "fft"
+        if cfg.n_components > 2:
+            ngm = 'barnes-hut'
+        tsne = TSNE(
+            n_components=cfg.n_components,
+            perplexity=perp,
+            initialization=cfg.initialization,
+            metric=cfg.metric,
+            neighbors=cfg.neighbors,
+            learning_rate=cfg.learning_rate,
+            negative_gradient_method=ngm,
+            verbose=True,
+            n_jobs=cfg.n_jobs,
+            n_iter=cfg.n_iter,
+            random_state=cfg.random_seed,
+        )
+
+        embedding = tsne.fit(wx)
+        #print(embedding)
+        divergence = embedding.kl_divergence
+        
+        if cfg.rotation and embedding.shape[1] == 2:
+            emb_columns_labels = ['wt-SNE {}'.format(i+1) for i in range(cfg.n_components)]
+            emb = pd.DataFrame(data=embedding,    # values
+                               index=df.index,    # 1st column as index
+                               columns=emb_columns_labels)  # 1st row as the column names
+            emb[cfg.class_label] = y
+            if cfg.task == 'classification':
+                first_class = emb[emb[cfg.class_label] == CLASS_LABELS[0]]
+            elif cfg.task == 'regression':
+                first_class = emb[emb[cfg.class_label].astype(float) <= 0.0]
+            print(len(first_class[first_class['wt-SNE 1'] >= 0.0]))
+            coord1_pos = len(first_class[first_class['wt-SNE 1'] >= 0.0])
+            if coord1_pos > 3:
+                first_class = first_class[first_class['wt-SNE 1'] >= 0.0]
+            rotation_point = [first_class['wt-SNE 1'].mean(), first_class['wt-SNE 2'].mean()]
+            embedding = utilstsne.rotate(embedding, rotation_point)
+            #print(embedding)
+
         emb_columns_labels = ['wt-SNE {}'.format(i+1) for i in range(cfg.n_components)]
         emb = pd.DataFrame(data=embedding,    # values
                            index=df.index,    # 1st column as index
                            columns=emb_columns_labels)  # 1st row as the column names
         emb[cfg.class_label] = y
+        emb.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.csv'.format(cfg.n_components)))
+        print(emb)
+
         if cfg.task == 'classification':
-            first_class = emb[emb[cfg.class_label] == CLASS_LABELS[0]]
+            embedding_silhouette = metrics.silhouette_score(embedding, y, metric='euclidean')
         elif cfg.task == 'regression':
-            first_class = emb[emb[cfg.class_label].astype(float) <= 0.0]
-        print(len(first_class[first_class['wt-SNE 1'] >= 0.0]))
-        coord1_pos = len(first_class[first_class['wt-SNE 1'] >= 0.0])
-        if coord1_pos > 3:
-            first_class = first_class[first_class['wt-SNE 1'] >= 0.0]
-        rotation_point = [first_class['wt-SNE 1'].mean(), first_class['wt-SNE 2'].mean()]
-        embedding = utilstsne.rotate(embedding, rotation_point)
-        #print(embedding)
-
-    emb_columns_labels = ['wt-SNE {}'.format(i+1) for i in range(cfg.n_components)]
-    emb = pd.DataFrame(data=embedding,    # values
-                       index=df.index,    # 1st column as index
-                       columns=emb_columns_labels)  # 1st row as the column names
-    emb[cfg.class_label] = y
-    emb.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.csv'.format(cfg.n_components)))
-    print(emb)
-
-    if cfg.task == 'classification':
-        embedding_silhouette = metrics.silhouette_score(embedding, y, metric='euclidean')
-    elif cfg.task == 'regression':
-        embedding_silhouette = 0.0
+            embedding_silhouette = 0.0
 
 
-    if cfg.title:
-        plot_title = os.path.basename(file_to_save).replace('.csv','')
-    else:
-        plot_title = ''
+        if cfg.title:
+            plot_title = os.path.basename(file_to_save).replace('.csv','')
+        else:
+            plot_title = ''
 
-    ax = utilstsne.plot(embedding, y, task=cfg.task, class_label=cfg.class_label, colors=COL, title=plot_title, draw_legend=cfg.draw_legend, draw_centers=cfg.draw_centers, draw_cluster_labels=False, s=cfg.dot_size)
-    plt.savefig(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d{}'.format(cfg.n_components, cfg.fig_extension)), bbox_inches='tight')
+        ax = utilstsne.plot(embedding, y, task=cfg.task, class_label=cfg.class_label, colors=COL, title=plot_title, draw_legend=cfg.draw_legend, draw_centers=cfg.draw_centers, draw_cluster_labels=False, s=cfg.dot_size)
+        plt.savefig(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d{}'.format(cfg.n_components, cfg.fig_extension)), bbox_inches='tight')
 
-    if cfg.n_components > 1:
-        zl = None
-        if cfg.n_components > 2:
-            zl = emb_columns_labels[2]
-        plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={cfg.class_label: classes}, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
-        plotly_fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.html'.format(cfg.n_components)))
-        if cfg.show_figs:
-            plotly_fig.show()
+        if cfg.n_components > 1:
+            zl = None
+            if cfg.n_components > 2:
+                zl = emb_columns_labels[2]
+            plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={cfg.class_label: classes}, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
+            plotly_fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.html'.format(cfg.n_components)))
+            if cfg.show_figs:
+                plotly_fig.show()
 
-    silhouettes = {'Original silhouette': [original_silhouette], 'Weighted silhouette': [weighted_silhouette], 'Embedding silhouette': [embedding_silhouette], 'KL divergence': [divergence]}
-    s_df = pd.DataFrame.from_dict(silhouettes)
-    print(s_df)
-    s_df.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_tsne{}d.csv'.format(cfg.n_components)))
+        silhouettes = {'Original silhouette': [original_silhouette], 'Weighted silhouette': [weighted_silhouette], 'Embedding silhouette': [embedding_silhouette], 'KL divergence': [divergence]}
+        s_df = pd.DataFrame.from_dict(silhouettes)
+        print(s_df)
+        s_df.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_tsne{}d.csv'.format(cfg.n_components)))
 
-    plt.close()
+        plt.close()
 
 if __name__ == '__main__': 
     main()

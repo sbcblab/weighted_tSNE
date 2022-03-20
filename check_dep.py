@@ -85,11 +85,6 @@ except:
 
 print('Pandas version must be >= 0.25.3, it is {}'.format(pd.__version__))
 
-try:
-    import seaborn as sn
-except:
-    print('Could not import seaborn')
-
 ########################################
 
 try:
@@ -143,90 +138,6 @@ except:
 ########################################
 
 try:
-    from openpyxl import Workbook
-except:
-    print('Could not import Workbook from openpyxl')    
-try:
-    from openpyxl.styles import PatternFill
-except:
-    print('Could not import PatternFill from openpyxl.styles')
-try:
-    from openpyxl.styles import Font, Color
-except:
-    print('Could not import Font, Color from openpyxl.styles')
-try:
-    from openpyxl.styles import Alignment
-except:
-    print('Could not import Alignment from openpyxl.styles')
-try: 
-    from openpyxl.utils import get_column_letter
-except ImportError:
-    from openpyxl.cell import get_column_letter
-except:
-    print('Could not import get_column_letter from openpyxl')
-
-########################################
-
-try:
-    import tensorflow
-except:
-    print('Could not import tensorflow') 
-try:    
-    from tensorflow.keras import backend as K
-except:
-    print('Could not import backend from tensorflow.keras')     
-try:
-    from tensorflow.keras import activations
-except:
-    print('Could not import activations from tensorflow.keras') 
-try:
-    from tensorflow.keras.models import load_model
-except:
-    print('Could not import load_model from tensorflow.keras.models') 
-try:
-    from tensorflow.keras.models import Sequential
-except:
-    print('Could not import Sequential from tensorflow.keras.models') 
-try:
-    from tensorflow.keras.layers import Dense, Activation, Dropout
-except:
-    print('Could not import Dense, Activation, Dropout from tensorflow.keras.layers') 
-try:
-    from tensorflow.keras.constraints import Constraint
-except:
-    print('Could not import Constraint from tensorflow.keras.constraints') 
-try:
-    from tensorflow.keras.constraints import max_norm
-except:
-    print('Could not import max_norm from tensorflow.keras.constraints') 
-try:
-    from tensorflow.keras.constraints import non_neg
-except:
-    print('Could not import non_neg from tensorflow.keras.constraints') 
-try:
-    from tensorflow.keras.utils import plot_model, to_categorical
-except:
-    print('Could not import plot_model, to_categorical from tensorflow.keras.utils') 
-try:
-    from tensorflow.keras.optimizers import Adam
-except:
-    print('Could not import Adam from tensorflow.keras.optimizers') 
-
-tensorflow.compat.v1.enable_eager_execution() 
-########################################
-
-try:
-    import deeplift
-except:
-    print('Could not import deeplift')    
-try:
-    from deeplift.conversion import kerasapi_conversion as kc
-except:
-    print('Could not import kerasapi_conversion from deeplift.conversion')  
-
-########################################
-
-try:
     import model_io
 except:
     print('Could not import model_io')
@@ -238,10 +149,6 @@ try:
     import plot_pca
 except:
     print('Could not import plot_pca')
-try:
-    from modules import Sequential,Linear,Tanh,Rect,SoftMax,Convolution,Flatten,SumPool,MaxPool
-except:
-    print('Could not import Sequential,Linear,Tanh,Rect,SoftMax,Convolution,Flatten,SumPool,MaxPool from modules')
 
 print('###############')
 print('Finished checking dependencies. Please install any missing library!')
