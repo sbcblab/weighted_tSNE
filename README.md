@@ -28,11 +28,11 @@ The complete CuMiDa can be found here: [https://sbcb.inf.ufrgs.br/cumida](https:
 
 You can download the complete results of the experiments below:
 
-- [XOR](IEEEVIS_data/RESULTS/xor.zip)
-- [Synth](IEEEVIS_data/RESULTS/synth.zip)
-- [Liver](IEEEVIS_data/RESULTS/liver.zip)
-- [Prostate](IEEEVIS_data/RESULTS/prostate.zip)
-- [Regression](IEEEVIS_data/RESULTS/regression.zip)
+- [XOR](IEEEVIS_data/results/xor.zip)
+- [Synth](IEEEVIS_data/results/synth.zip)
+- [Liver](IEEEVIS_data/results/liver.zip)
+- [Prostate](IEEEVIS_data/results/prostate.zip)
+- [Regression](IEEEVIS_data/results/regression.zip)
 
 ## Libraries
 
