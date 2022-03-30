@@ -34,6 +34,8 @@ You can download the complete results of the experiments below:
 - [Prostate](IEEEVIS_data/results/prostate.zip)
 - [Regression](IEEEVIS_data/results/regression.zip)
 
+Interactive plots of the results can be seen here: [https://sbcblab.github.io/wtsne](https://sbcblab.github.io/wtsne)
+
 ## Libraries
 
 This implementation of relevance aggregation uses the following [Python 3.7](https://www.python.org/) libraries:
