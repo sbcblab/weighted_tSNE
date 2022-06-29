@@ -127,6 +127,8 @@ def main():
     if cfg.no_weights:
         cfg.weights_file = ['0']
 
+    all_sel_sil = {'Selection': [], 'Original silhouette': [], 'Weighted silhouette': [], 'Embedding silhouette': [], 'KL divergence': []}    
+        
     for selector_file in cfg.weights_file:
 
         print('### {}'.format(selector_file))
@@ -269,8 +271,18 @@ def main():
         print(s_df)
         s_df.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_tsne{}d.csv'.format(cfg.n_components)))
 
+        all_sel_sil['Selection'].append(selector_file) 
+        all_sel_sil['Original silhouette'].append(original_silhouette)
+        all_sel_sil['Weighted silhouette'].append(weighted_silhouette)
+        all_sel_sil['Embedding silhouette'].append(embedding_silhouette)
+        all_sel_sil['KL divergence'].append(divergence)
+        
         plt.close()
-
+    
+    all_sel_sil_df = pd.DataFrame.from_dict(all_sel_sil)
+    print(all_sel_sil_df)
+    all_sel_sil_df.to_csv(cfg.output_folder + 'selectors_silhouette_tsne{}d.csv'.format(cfg.n_components))
+        
 if __name__ == '__main__': 
     main()
 
