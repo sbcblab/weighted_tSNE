@@ -12,9 +12,11 @@ from sklearn.decomposition import PCA
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+from matplotlib.colors import is_color_like
 import plotly.tools as tls
 import plotly.express as px
 import utilstsne
+from tqdm import tqdm
 
 import RR_utils
 
@@ -35,6 +37,7 @@ colhex = {
     'DRKBRW':  '#654321',
     'BEIGE':   '#C2C237',
     'WHITE':   '#FFFFFF',
+    
 }
 
 dummy = False
@@ -53,13 +56,14 @@ def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silho
                        index=df.index,    # 1st column as index
                        columns=pca_columns_labels)  # 1st row as the column names
     pca_emb[cfg.class_label] = y
+    print('Writing file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d.csv'.format(cfg.n_components))))
     pca_emb.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d.csv'.format(cfg.n_components)))
     print(pca_emb)
 
     zl = None
     if cfg.n_components > 2:
         zl = pca_columns_labels[2]    
-    fig = utilstsne.iteractive_plot(pca_emb, x_label=pca_columns_labels[0], y_label=pca_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={class_label: classes}, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
+    fig = utilstsne.iteractive_plot(pca_emb, x_label=pca_columns_labels[0], y_label=pca_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={class_label: classes}, color_label=cfg.class_label, colors=[colhex.get(c, c) for c in cfg.class_colors], size=cfg.dot_size)
     fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d.html'.format(cfg.n_components)))
     if cfg.show_figs:
         fig.show()
@@ -69,7 +73,8 @@ def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silho
     else:
         plot_title = ''
 
-    ax = utilstsne.plot(components, y, task=cfg.task, class_label=cfg.class_label, colors=colors, title=plot_title, draw_legend=cfg.draw_legend, draw_centers=cfg.draw_centers, draw_cluster_labels=False, s=cfg.dot_size)
+    ax = utilstsne.plot(components, y, task=cfg.task, class_label=cfg.class_label, colors=colors, title=plot_title, draw_legend=cfg.draw_legend, pos_legend=cfg.pos_legend, draw_centers=cfg.draw_centers, draw_cluster_labels=cfg.draw_cluster_labels, s=cfg.dot_size)
+    print('Saving file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d{}'.format(cfg.n_components, cfg.fig_extension))))
     plt.savefig(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d{}'.format(cfg.n_components, cfg.fig_extension)), bbox_inches='tight')
 
     if cfg.task == 'classification':
@@ -80,21 +85,36 @@ def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silho
     silhouettes = {'Original silhouette': [original_silhouette], 'Weighted silhouette': [weighted_silhouette], 'Embedding silhouette': [embedding_silhouette]}
     s_df = pd.DataFrame.from_dict(silhouettes)
     print(s_df)
+    print('Writing file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_pca{}d.csv'.format(cfg.n_components))))
     s_df.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_pca{}d.csv'.format(cfg.n_components)))
 
 def main():
-    df = pd.read_csv(cfg.dataset_file, delimiter=cfg.dataset_sep, header=0, index_col=cfg.row_index)
+    
+    print('Loading ' + cfg.dataset_file)
+    # https://stackoverflow.com/questions/52209290/how-do-i-make-a-progress-bar-for-loading-pandas-dataframe-from-a-large-xlsx-file
+    df = pd.concat([chunk for chunk in tqdm(pd.read_csv(cfg.dataset_file, delimiter=cfg.dataset_sep, header=0, index_col=cfg.row_index, chunksize=cfg.load_chunksize), desc='Loading data from {} in chunks of {}'.format(cfg.dataset_file, cfg.load_chunksize))])    
+    # https://stackoverflow.com/questions/30494569/how-to-force-pandas-read-csv-to-use-float32-for-all-float-columns
+    df = df.astype({c: cfg.dtype_float for c in df.select_dtypes(include='float64').columns})
+    df = df.astype({c: cfg.dtype_int for c in df.select_dtypes(include='int64').columns})   
     df = RR_utils.check_dataframe(df, cfg.class_label, cfg.task)
 
     COL = {}
     CLASS_LABELS = list(np.sort(df[cfg.class_label].astype(str).unique()))
+    if cfg.task == 'classification':
+        if len(cfg.class_colors) < len(CLASS_LABELS):
+            raise Exception('There are only {} colors for {} classes.'.format(len(cfg.class_colors), len(CLASS_LABELS)))
+            
     for c, l in zip(cfg.class_colors, CLASS_LABELS):
-        COL[l] = colhex[c]
+        COL[l] = colhex.get(c,c)
     print(COL)
 
+    if cfg.task == 'classification':
+        utilstsne.check_colors(COL, colhex)    
+    
     print('THE DATA SET:')
     print(df)
-
+    print(df.dtypes) 
+    
     if cfg.task == 'classification':
         classes = list(np.sort(df[cfg.class_label].astype(str).unique()))
         print('THE CLASSES:')
@@ -113,6 +133,8 @@ def main():
 
     if cfg.standardized:
         df, meanVals, stdVals = RR_utils.standardize(df, cfg.class_label)
+        del meanVals
+        del stdVals
 
     x = df.drop(cfg.class_label, axis=1).to_numpy()
     y = df[cfg.class_label].astype(str)
@@ -128,7 +150,9 @@ def main():
         cfg.weights_file = ['0']
 
     all_sel_sil = {'Selection': [], 'Original silhouette': [], 'Weighted silhouette': [], 'Embedding silhouette': [], 'KL divergence': []}    
-        
+       
+    index_df = df.index
+    
     for selector_file in cfg.weights_file:
 
         print('### {}'.format(selector_file))
@@ -189,7 +213,7 @@ def main():
 
         if cfg.compute_pca:
             get_pca(wx, df, y, file_to_save, cfg.class_label, classes, COL, original_silhouette, weighted_silhouette)
-
+            
         perp = 0
         if cfg.perplexity == "auto":
             perp = max(30, x.shape[0]/100)
@@ -220,7 +244,7 @@ def main():
         if cfg.rotation and embedding.shape[1] == 2:
             emb_columns_labels = ['wt-SNE {}'.format(i+1) for i in range(cfg.n_components)]
             emb = pd.DataFrame(data=embedding,    # values
-                               index=df.index,    # 1st column as index
+                               index=index_df,    # 1st column as index
                                columns=emb_columns_labels)  # 1st row as the column names
             emb[cfg.class_label] = y
             if cfg.task == 'classification':
@@ -237,9 +261,10 @@ def main():
 
         emb_columns_labels = ['wt-SNE {}'.format(i+1) for i in range(cfg.n_components)]
         emb = pd.DataFrame(data=embedding,    # values
-                           index=df.index,    # 1st column as index
+                           index=index_df,    # 1st column as index
                            columns=emb_columns_labels)  # 1st row as the column names
         emb[cfg.class_label] = y
+        print('Writing file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.csv'.format(cfg.n_components))))
         emb.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.csv'.format(cfg.n_components)))
         print(emb)
 
@@ -248,20 +273,20 @@ def main():
         elif cfg.task == 'regression':
             embedding_silhouette = 0.0
 
-
         if cfg.title:
             plot_title = os.path.basename(file_to_save).replace('.csv','')
         else:
             plot_title = ''
 
-        ax = utilstsne.plot(embedding, y, task=cfg.task, class_label=cfg.class_label, colors=COL, title=plot_title, draw_legend=cfg.draw_legend, draw_centers=cfg.draw_centers, draw_cluster_labels=False, s=cfg.dot_size)
+        ax = utilstsne.plot(embedding, y, task=cfg.task, class_label=cfg.class_label, colors=COL, title=plot_title, draw_legend=cfg.draw_legend, pos_legend=cfg.pos_legend, draw_centers=cfg.draw_centers, draw_cluster_labels=cfg.draw_cluster_labels, s=cfg.dot_size)
+        print('Saving file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d{}'.format(cfg.n_components, cfg.fig_extension))))
         plt.savefig(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d{}'.format(cfg.n_components, cfg.fig_extension)), bbox_inches='tight')
 
         if cfg.n_components > 1:
             zl = None
             if cfg.n_components > 2:
                 zl = emb_columns_labels[2]
-            plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={cfg.class_label: classes}, color_label=cfg.class_label, colors=[colhex[c] for c in cfg.class_colors], size=cfg.dot_size)
+            plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={cfg.class_label: classes}, color_label=cfg.class_label, colors=[colhex.get(c, c) for c in cfg.class_colors], size=cfg.dot_size)
             plotly_fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.html'.format(cfg.n_components)))
             if cfg.show_figs:
                 plotly_fig.show()
@@ -269,6 +294,7 @@ def main():
         silhouettes = {'Original silhouette': [original_silhouette], 'Weighted silhouette': [weighted_silhouette], 'Embedding silhouette': [embedding_silhouette], 'KL divergence': [divergence]}
         s_df = pd.DataFrame.from_dict(silhouettes)
         print(s_df)
+        print('Writing file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_tsne{}d.csv'.format(cfg.n_components))))
         s_df.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','silhouette_tsne{}d.csv'.format(cfg.n_components)))
 
         all_sel_sil['Selection'].append(selector_file) 
@@ -279,8 +305,10 @@ def main():
         
         plt.close()
     
+    del df
     all_sel_sil_df = pd.DataFrame.from_dict(all_sel_sil)
     print(all_sel_sil_df)
+    print('Writing file {}'.format(cfg.output_folder + 'selectors_silhouette_tsne{}d.csv'.format(cfg.n_components)))
     all_sel_sil_df.to_csv(cfg.output_folder + 'selectors_silhouette_tsne{}d.csv'.format(cfg.n_components))
         
 if __name__ == '__main__': 

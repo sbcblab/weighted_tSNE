@@ -11,6 +11,7 @@ import sklearn
 from sklearn.utils import class_weight
 from sklearn.model_selection import StratifiedKFold, KFold
 import scipy.stats as stats
+from tqdm import tqdm
 
 import tensorflow
 from tensorflow.keras import backend as K

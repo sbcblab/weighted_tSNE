@@ -3,6 +3,7 @@ from os.path import abspath, dirname, join
 import numpy as np
 import math
 import scipy.sparse as sp
+from matplotlib.colors import is_color_like
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mpl_toolkits.mplot3d import Axes3D
@@ -10,6 +11,10 @@ from mpl_toolkits.mplot3d import Axes3D
 FILE_DIR = dirname(abspath(__file__))
 DATA_DIR = join(FILE_DIR, "data")
 
+def check_colors(colors, d):
+    for c in colors:
+       if not is_color_like(colors[c]) and colors[c] not in d:
+            raise Exception('{} - {} is not a valid color.'.format(c, colors[c]))
 
 def unit_vector(vector):
     # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
@@ -101,6 +106,7 @@ def plot(
     ax=None,
     title=None,
     draw_legend=True,
+    pos_legend='center left',
     draw_centers=False,
     draw_cluster_labels=False,
     colors=None,
@@ -183,9 +189,9 @@ def plot(
                 for idx, label in enumerate(classes):
                     ax.text(
                         centers[idx, 0],
-                        centers[idx, 1] + 1.5,
+                        centers[idx, 1] + 0.2,
                         label,
-                        fontsize=kwargs.get("fontsize", 6),
+                        fontsize=kwargs.get("fontsize", 12),
                         horizontalalignment="center",
                     )
     
@@ -221,7 +227,7 @@ def plot(
             )
             for yi in classes
         ]
-        legend_kwargs_ = dict(loc="center left", bbox_to_anchor=(1, 0.5), frameon=False, fontsize=24, )
+        legend_kwargs_ = dict(loc=pos_legend, bbox_to_anchor=(1, 0.5), frameon=False, fontsize=24, )
         if legend_kwargs is not None:
             legend_kwargs_.update(legend_kwargs)
         ax.legend(handles=legend_handles, **legend_kwargs_)

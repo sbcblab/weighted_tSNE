@@ -51,6 +51,11 @@ try:
         import cupy as np
 except:
     print('Could not import cupy')
+    
+try:
+    from tqdm import tqdm
+except:
+    print('Could not import tqdm')
 
 ########################################
 
@@ -66,6 +71,11 @@ try:
 except:
     print('Could not import matplotlib.pyplot')
 
+try:
+    from matplotlib.colors import is_color_like
+except:
+    print('Could not import is_color_like from matplotlib.colors')
+    
 try:
     import plotly
 except:
@@ -138,17 +148,19 @@ except:
 ########################################
 
 try:
-    import model_io
+    from openTSNE import TSNE
 except:
-    print('Could not import model_io')
+    print('Could not import TSNE from openTSNE')    
+
+#######################################
+try:
+    import utilstsne
+except:
+    print('Could not import utilstsne')
 try:
     import RR_utils
 except:
     print('Could not import RR_utils')
-try:
-    import plot_pca
-except:
-    print('Could not import plot_pca')
 
 print('###############')
 print('Finished checking dependencies. Please install any missing library!')
