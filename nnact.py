@@ -40,10 +40,12 @@ def main():
 
     dot_size       = 100    # size of dots in the plots
     class_colors   = ['RED', 'BLUE', 'YELLOW', 'CYAN', 'GREEN', 'BEIGE', 'DRKBRW', 'BLACK', 'SILVER', 'ORANGE']
-    class_label = 'class'
+    x_label = 'brute_0ZERO'
+    y_label = 'brute_1ONE'
+    class_label = 'y'
     task = 'classification'
-    dataset_file = 'IEEEVIS/liveract.csv'
-    output_folder  = 'IEEEVIS/RESULTS/liver/'
+    dataset_file = 'RESULTS/DMDK2/xornew/xor_2in50_500_1_0150_out.csv'
+    output_folder  = 'RESULTS/DMDK2/xornew/'
     standardized = False
 
     df = pd.read_csv(dataset_file, delimiter=',', header=0, index_col=0)
@@ -77,9 +79,18 @@ def main():
     if standardized:
         df, meanVals, stdVals = RR_utils.standardize(df, class_label)
 
-    x = df.drop(class_label, axis=1).to_numpy()
     y = df[class_label].astype(str)
+    print(y)        
+        
+    
+    #x = df.drop(class_label, axis=1).to_numpy()
+    df = df[[x_label, y_label]]
+    df.columns = ['0ZERO', '1ONE']
+    print(df)
+    x = df.to_numpy()
+    print(x)
 
+    
     print("Data set contains %d samples with %d features" % x.shape)
 
     if task == 'classification':
@@ -92,7 +103,7 @@ def main():
     ax = utilstsne.plot(x, y, task=task, class_label=class_label, colors=COL, title='', draw_legend=False, draw_centers=False, draw_cluster_labels=False, s=dot_size)
     plt.savefig(output_folder + os.path.basename(file_to_save).replace('.csv','_act{}d{}'.format(2, '.pdf')), bbox_inches='tight')
 
-    plotly_fig = utilstsne.iteractive_plot(df, x_label='heptocarcinoma', y_label='normal', z_label=None, task=task, sorted_classes={class_label: classes}, color_label=class_label, colors=[colhex[c] for c in class_colors], size=dot_size)
+    plotly_fig = utilstsne.iteractive_plot(df, x_label='0ZERO', y_label='1ONE', z_label=None, task=task, sorted_classes={class_label: classes}, color_label=class_label, colors=[colhex[c] for c in class_colors], size=dot_size)
     plotly_fig.write_html(output_folder + os.path.basename(file_to_save).replace('.csv','_act{}d.html'.format(2)))
 
     plt.close()

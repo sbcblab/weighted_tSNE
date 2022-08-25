@@ -5,16 +5,7 @@ import numpy as np
 
 dataset_file   = "DMDK/DATA/xor_500samples_50features.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
 #dataset_file   = "IEEEVIS/DATA/Liver_GSE22405.csv" # path to data file (must be .csv, features as columns, first row and first column are labels, first column after labels should contain the classes or target values)
-weights_file   = ["../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0015_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0030_score_xor_2in50_500.csv", 
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0045_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0060_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0075_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0090_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0105_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0120_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0135_score_xor_2in50_500.csv",
-                  "../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0150_score_xor_2in50_500.csv",
+weights_file   = ["weights.csv",
                  ]
 #weights_file   = ["IEEEVIS/selections/KruskallWallisFilter_xor.csv",  # list with paths to the files with the weights of each feature
 #                  "IEEEVIS/selections/MutualInformationFilter_xor.csv",
@@ -31,7 +22,7 @@ weights_file   = ["../RelAgg/RESULTS/DMDK/xor_2in50_500/RelAgg_0015_score_xor_2i
 # xor, Synth_A, Prostate, Liver
 # Liver_GSE22405, Prostate_GSE6919_U95C, synth_100samples_5000features_50informative, xor_500samples_50features, regression_4in100_1000
 output_folder  = 'RESULTS/xor/'  # name of directory in which the results will be saved
-fig_extension  = '.pdf'
+fig_extension  = '.pdf' # .pdf, .png, etc.
 
 task            = "classification" # "classification" or "regression"
 class_label     = "class"          # label of the column with the classes or target values

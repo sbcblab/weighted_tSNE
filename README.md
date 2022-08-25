@@ -20,19 +20,13 @@ python3 wtsne.py config.py
 
 ## Datasets
 
-You can download the datasets used in the experiments [here](IEEEVIS_data/DATA.zip) and the scores from the feature scorers [here](IEEEVIS_data/selections.zip).
+You can download the datasets used in the experiments [here](DATA.zip) and the scores from the feature scorers [here](selections.zip).
 
 The complete CuMiDa can be found here: [https://sbcb.inf.ufrgs.br/cumida](https://sbcb.inf.ufrgs.br/cumida)
 
-## Results
+## Experiments
 
-You can download the complete results of the experiments below:
-
-- [XOR](IEEEVIS_data/results/xor.zip)
-- [Synth](IEEEVIS_data/results/synth.zip)
-- [Liver](IEEEVIS_data/results/liver.zip)
-- [Prostate](IEEEVIS_data/results/prostate.zip)
-- [Regression](IEEEVIS_data/results/regression.zip)
+You can download the complete configuration of the experiments [here](configurations).
 
 Interactive plots of the results can be seen here: [https://sbcblab.github.io/wtsne](https://sbcblab.github.io/wtsne)
 

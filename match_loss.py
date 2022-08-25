@@ -20,7 +20,8 @@ def main():
     print(df_loss)
     print(df_silh)
     
-    df_loss = df_loss[df_loss['epoch'] % freq == 0]
+    if freq > 1:
+        df_loss = df_loss[df_loss['epoch'] % freq == 0]
     
     df_loss.reset_index(drop=True, inplace=True)
     df_silh.reset_index(drop=True, inplace=True)
@@ -30,10 +31,13 @@ def main():
     df_stack.to_csv(silh_file.replace('.csv', 'Xloss.csv'))
     
     # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.corr.html
-    for col1 in ['loss', 'accuracy', 'KL divergence']:
+    #met = ['loss', 'accuracy', 'KL divergence']
+    met = ['loss', 'KL divergence']
+    
+    for col1 in met:
         for col2 in ["Embedding silhouette", 'Weighted silhouette', 'KL divergence']:
-            corr = df_stack[col1].corr(df_stack[col2])
-            print ("Correlation between ", col1, " and ", col2, "is: ", round(corr, 2))    
+            corr = df_stack[col1].corr(df_stack[col2], method='pearson')
+            print ("Correlation between ", col1, " and ", col2, "is: ", round(corr, 4))    
         
 if __name__ == '__main__': 
     main()

@@ -124,7 +124,7 @@ def main():
             raise Exception("The number of colors does not match the number of classes!") 
     elif cfg.task == 'regression':
         classes = []
-        targets_info = (df[cfg.class_label].min(), df[cfg.class_label].max(), df[cfg.class_label].mean(), df[cfg.class_label].std())
+        targets_info = (df[cfg.class_label].min(), df[cfg.class_label].max(), df[cfg.class_label].mean(), df[cfg.class_label].std(), df[cfg.class_label].median())
         print('TARGETS INFO:')
         print(targets_info)
 
@@ -136,15 +136,28 @@ def main():
         del meanVals
         del stdVals
 
+    y = df[cfg.class_label].astype(str)    
     x = df.drop(cfg.class_label, axis=1).to_numpy()
-    y = df[cfg.class_label].astype(str)
-
+    
+    print(cfg.class_label)
+    print(y)
+    
     print("Data set contains %d samples with %d features" % x.shape)
 
     if cfg.task == 'classification':
         original_silhouette = metrics.silhouette_score(x, y, metric='euclidean')
     elif cfg.task == 'regression':
-        original_silhouette = 0.0
+        try:
+            y_reg = y.astype(float)
+            y_med = y_reg.median()
+            y_reg[y_reg >= y_med] = 1
+            y_reg[y_reg <  y_med] = 0
+            y_reg = y_reg.astype(str)
+            print(cfg.class_label + ' masked to compute silhouette score in regression:')
+            print(y_reg)
+            original_silhouette = metrics.silhouette_score(x, y_reg, metric='euclidean')
+        except:
+            original_silhouette = 0.0
 
     if cfg.no_weights:
         cfg.weights_file = ['0']
@@ -209,8 +222,11 @@ def main():
         if cfg.task == 'classification':
             weighted_silhouette = metrics.silhouette_score(wx, y, metric='euclidean')
         elif cfg.task == 'regression':
-            weighted_silhouette = 0.0
-
+            try:
+                weighted_silhouette = metrics.silhouette_score(wx, y_reg, metric='euclidean')
+            except:
+                weighted_silhouette = 0.0
+                       
         if cfg.compute_pca:
             get_pca(wx, df, y, file_to_save, cfg.class_label, classes, COL, original_silhouette, weighted_silhouette)
             
@@ -271,7 +287,10 @@ def main():
         if cfg.task == 'classification':
             embedding_silhouette = metrics.silhouette_score(embedding, y, metric='euclidean')
         elif cfg.task == 'regression':
-            embedding_silhouette = 0.0
+            try:
+                embedding_silhouette = metrics.silhouette_score(embedding, y_reg, metric='euclidean')
+            except:           
+                embedding_silhouette = 0.0
 
         if cfg.title:
             plot_title = os.path.basename(file_to_save).replace('.csv','')
