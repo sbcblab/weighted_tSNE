@@ -21,6 +21,7 @@ from tqdm import tqdm
 import RR_utils
 
 config_file = sys.argv[1]
+print(config_file)
 cfg = importlib.import_module(config_file.replace('/','.').replace('.py',''))
 
 colhex = {
@@ -37,7 +38,7 @@ colhex = {
     'DRKBRW':  '#654321',
     'BEIGE':   '#C2C237',
     'WHITE':   '#FFFFFF',
-    
+
 }
 
 dummy = False
@@ -64,7 +65,23 @@ def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silho
     if cfg.n_components > 2:
         zl = pca_columns_labels[2]    
     fig = utilstsne.iteractive_plot(pca_emb, x_label=pca_columns_labels[0], y_label=pca_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={class_label: classes}, color_label=cfg.class_label, colors=[colhex.get(c, c) for c in cfg.class_colors], size=cfg.dot_size)
+    if cfg.title:
+        plot_title = os.path.basename(file_to_save).replace('.csv','')
+    else:
+        plot_title = ''
+    fig.update_layout(legend = dict(font = dict(family = "Arial", size = 20, color = "black"),orientation="h"),legend_title = dict(font = dict(family = "Arial", size = 20, color = "black")))
+    fig.update_yaxes(title_font=dict(size=20))
+    fig.update_xaxes(title_font=dict(size=20))
+    fig.update_traces(marker_size=14)
+    fig.update_layout(title_text=plot_title, title_x=0.5)
+    fig.update_xaxes(title_font_family="Arial")
+
     fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d.html'.format(cfg.n_components)))
+    fig.update_layout(width=800, height=650,autosize=False,)
+    if not os.path.exists("images"):
+        os.mkdir("images")
+    fig.write_image("images/pca.svg")
+    fig.write_image("images/pca.png")
     if cfg.show_figs:
         fig.show()
 
@@ -77,7 +94,9 @@ def get_pca(x, df, y, file_to_save, class_label, classes, colors, original_silho
     print('Saving file {}'.format(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d{}'.format(cfg.n_components, cfg.fig_extension))))
     plt.savefig(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_pca{}d{}'.format(cfg.n_components, cfg.fig_extension)), bbox_inches='tight')
 
-    if cfg.task == 'classification':
+    if len(classes) == 1:
+        embedding_silhouette = 0.0
+    elif cfg.task == 'classification':
         embedding_silhouette = metrics.silhouette_score(components, y, metric='euclidean')
     elif cfg.task == 'regression':
         embedding_silhouette = 0.0
@@ -144,7 +163,9 @@ def main():
     
     print("Data set contains %d samples with %d features" % x.shape)
 
-    if cfg.task == 'classification':
+    if len(classes) == 1:
+        original_silhouette = 0.0
+    elif cfg.task == 'classification':
         original_silhouette = metrics.silhouette_score(x, y, metric='euclidean')
     elif cfg.task == 'regression':
         try:
@@ -219,7 +240,9 @@ def main():
         else:
             wx = x
 
-        if cfg.task == 'classification':
+        if len(classes) == 1:
+            weighted_silhouette = 0.0
+        elif cfg.task == 'classification':
             weighted_silhouette = metrics.silhouette_score(wx, y, metric='euclidean')
         elif cfg.task == 'regression':
             try:
@@ -284,7 +307,9 @@ def main():
         emb.to_csv(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.csv'.format(cfg.n_components)))
         print(emb)
 
-        if cfg.task == 'classification':
+        if len(classes) == 1:
+            embedding_silhouette = 0.0
+        elif cfg.task == 'classification':
             embedding_silhouette = metrics.silhouette_score(embedding, y, metric='euclidean')
         elif cfg.task == 'regression':
             try:
@@ -306,7 +331,24 @@ def main():
             if cfg.n_components > 2:
                 zl = emb_columns_labels[2]
             plotly_fig = utilstsne.iteractive_plot(emb, x_label=emb_columns_labels[0], y_label=emb_columns_labels[1], z_label=zl, task=cfg.task, sorted_classes={cfg.class_label: classes}, color_label=cfg.class_label, colors=[colhex.get(c, c) for c in cfg.class_colors], size=cfg.dot_size)
+
+            plotly_fig.update_layout(legend = dict(font = dict(family = "Arial", size = 20, color = "black"),orientation="h"),
+                  legend_title = dict(font = dict(family = "Arial", size = 20, color = "black")))
+
+
+            plotly_fig.update_yaxes(title_font=dict(size=20))
+            plotly_fig.update_xaxes(title_font=dict(size=20))
+            plotly_fig.update_traces(marker_size=14)
+            plotly_fig.update_layout(title_text=plot_title, title_x=0.5)
+            plotly_fig.update_xaxes(title_font_family="Arial")
+
             plotly_fig.write_html(cfg.output_folder + os.path.basename(file_to_save).replace('.csv','_tsne{}d.html'.format(cfg.n_components)))
+            if not os.path.exists("images"):
+                        os.mkdir("images")
+            plotly_fig.update_layout(width=800, height=650, autosize=False)
+
+            plotly_fig.write_image("images/tsne.svg")
+            plotly_fig.write_image("images/tsne.png")
             if cfg.show_figs:
                 plotly_fig.show()
 
@@ -329,7 +371,7 @@ def main():
     print(all_sel_sil_df)
     print('Writing file {}'.format(cfg.output_folder + 'selectors_silhouette_tsne{}d.csv'.format(cfg.n_components)))
     all_sel_sil_df.to_csv(cfg.output_folder + 'selectors_silhouette_tsne{}d.csv'.format(cfg.n_components))
-        
+
 if __name__ == '__main__': 
     main()
 

@@ -19,7 +19,12 @@ def check_colors(colors, d):
 def unit_vector(vector):
     # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
     """ Returns the unit vector of the vector.  """
-    return vector / np.linalg.norm(vector)
+    
+    # https://stackoverflow.com/questions/18395725/test-if-numpy-array-contains-only-zeros
+    if not np.any(vector):
+        return vector
+    else:
+        return vector / np.linalg.norm(vector)
 
 def angle_between(v1, v2):
     # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
