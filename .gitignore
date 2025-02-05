@@ -14,3 +14,6 @@ DMDK
 selections
 liver
 *.ipynb*
+wtsne-env
+images/
+images
